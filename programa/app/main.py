@@ -4,12 +4,12 @@ import os
 from pathlib import Path
 import sys
 
-from PySide6.QtCore import Qt, QStandardPaths, QByteArray, QUrl
-from PySide6.QtGui import QColor, QFont, QPixmap, QTextDocument, QAction, QPainter, QImage
-from PySide6.QtPrintSupport import QPrinter, QPrintDialog
-from PySide6.QtWidgets import (QApplication, QMainWindow, QTableWidget, QTableWidgetItem,
+from PySide2.QtCore import Qt, QStandardPaths, QByteArray, QUrl
+from PySide2.QtGui import QColor, QFont, QPixmap, QTextDocument, QPainter, QImage
+from PySide2.QtPrintSupport import QPrinter, QPrintDialog
+from PySide2.QtWidgets import (QApplication, QMainWindow, QTableWidget, QTableWidgetItem,
     QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog,
-    QMessageBox, QInputDialog, QDialog, QLineEdit, QComboBox, QLabel, QAbstractItemView)
+    QMessageBox, QAction, QInputDialog, QDialog, QLineEdit, QComboBox, QLabel, QAbstractItemView)
 from openpyxl.utils import get_column_letter, coordinate_to_tuple
 
 try:
@@ -35,8 +35,8 @@ class Sheet(QTableWidget):
         self.setHorizontalHeaderLabels([get_column_letter(c + 1) for c in range(sheet.max_column)])
         self.verticalHeader().setDefaultSectionSize(22)
         self.setAlternatingRowColors(False)
-        self.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
-        self.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.setShowGrid(False)
         self.horizontalHeader().hide()
         self.verticalHeader().hide()
@@ -58,12 +58,12 @@ class Sheet(QTableWidget):
                 if cell.data_type == 'f' and cell.coordinate not in overrides:
                     value = datetime.date.today().strftime('%d/%m/%Y') if 'TODAY()' in str(cell.value) else str(len(store.records()))
                 item = QTableWidgetItem('' if value is None else str(value))
-                item.setFont(QFont(cell.font.name or 'Calibri', int(cell.font.sz or 11), QFont.Weight.Bold if cell.font.bold else QFont.Weight.Normal))
+                item.setFont(QFont(cell.font.name or 'Calibri', int(cell.font.sz or 11), QFont.Bold if cell.font.bold else QFont.Normal))
                 item.setForeground(QColor(color(cell.font.color, '#203764')))
                 if cell.fill.patternType == 'solid':
                     item.setBackground(QColor(color(cell.fill.fgColor, '#ffffff')))
-                alignment = {'center': Qt.AlignmentFlag.AlignHCenter, 'right': Qt.AlignmentFlag.AlignRight}.get(cell.alignment.horizontal, Qt.AlignmentFlag.AlignLeft)
-                item.setTextAlignment(alignment | Qt.AlignmentFlag.AlignVCenter)
+                alignment = {'center': Qt.AlignHCenter, 'right': Qt.AlignRight}.get(cell.alignment.horizontal, Qt.AlignLeft)
+                item.setTextAlignment(alignment | Qt.AlignVCenter)
                 self.setItem(cell.row - 1, cell.column - 1, item)
         for merged in sheet.merged_cells.ranges:
             self.setSpan(merged.min_row - 1, merged.min_col - 1, merged.max_row - merged.min_row + 1, merged.max_col - merged.min_col + 1)
@@ -80,16 +80,16 @@ class Sheet(QTableWidget):
         for row in range(first,last+1):
             for col in range(self.columnCount()):
                 item = self.item(row,col)
-                if not item or not item.text() or not item.textAlignment() & Qt.AlignmentFlag.AlignRight:
+                if not item or not item.text() or not item.textAlignment() & Qt.AlignRight:
                     continue
                 rect = self.visualItemRect(item)
                 painter.setFont(item.font())
                 width = painter.fontMetrics().horizontalAdvance(item.text())+8
                 if width <= rect.width(): continue
                 rect.setLeft(rect.right()-width)
-                painter.fillRect(rect,item.background() if item.background().style()!=Qt.BrushStyle.NoBrush else QColor('white'))
+                painter.fillRect(rect,item.background() if item.background().style()!=Qt.NoBrush else QColor('white'))
                 painter.setPen(item.foreground().color())
-                painter.drawText(rect,Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter,item.text())
+                painter.drawText(rect,Qt.AlignRight|Qt.AlignVCenter,item.text())
         painter.end()
 
     def text(self, address):
@@ -210,7 +210,7 @@ class Window(QMainWindow):
         if self.photo:
             pixmap = QPixmap()
             if pixmap.loadFromData(QByteArray(self.photo)):
-                self.photo_label.setPixmap(pixmap.scaled(140,140,Qt.AspectRatioMode.KeepAspectRatio,Qt.TransformationMode.SmoothTransformation))
+                self.photo_label.setPixmap(pixmap.scaled(140,140,Qt.KeepAspectRatio,Qt.SmoothTransformation))
                 return
         self.photo_label.setText('Foto do atleta: nenhuma imagem selecionada')
 
@@ -290,7 +290,7 @@ class Window(QMainWindow):
         if not self.store.get(code):
             QMessageBox.warning(self,'Excluir','Selecione um cadastro existente.')
             return
-        if QMessageBox.question(self,'Excluir','Excluir este atleta? Faça um backup antes se precisar recuperar o cadastro.') == QMessageBox.StandardButton.Yes:
+        if QMessageBox.question(self,'Excluir','Excluir este atleta? Faça um backup antes se precisar recuperar o cadastro.') == QMessageBox.Yes:
             self.store.delete(code)
             self.clear()
             for address in self.store.ficha:
@@ -316,8 +316,8 @@ class Window(QMainWindow):
         layout.addWidget(query)
         results = QTableWidget(0,4)
         results.setHorizontalHeaderLabels(['Código','Nome','Categoria','Posição'])
-        results.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        results.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        results.setSelectionBehavior(QAbstractItemView.SelectRows)
+        results.setEditTriggers(QAbstractItemView.NoEditTriggers)
         results.setColumnWidth(1,350)
         layout.addWidget(results)
         count = QLabel()
@@ -339,7 +339,7 @@ class Window(QMainWindow):
         field.currentIndexChanged.connect(filter_rows)
         results.cellDoubleClicked.connect(select)
         filter_rows()
-        dialog.exec()
+        dialog.exec_()
 
     def choose_photo(self):
         path,_ = QFileDialog.getOpenFileName(self,'Selecionar foto','','Imagens (*.jpg *.jpeg *.png *.bmp)')
@@ -375,7 +375,7 @@ class Window(QMainWindow):
                 item = sheet.item(row-1,col-1)
                 value = html.escape(item.text()) if item else ''
                 rs,cs = spans.get((row,col),(1,1))
-                bg = item.background().color().name() if item and item.background().style()!=Qt.BrushStyle.NoBrush else '#ffffff'
+                bg = item.background().color().name() if item and item.background().style()!=Qt.NoBrush else '#ffffff'
                 parts.append(f'<td rowspan="{rs}" colspan="{cs}" bgcolor="{bg}"><font color="#203764" size="2">{value}</font></td>')
             parts.append('</tr>')
         parts.append('</table>')
@@ -385,7 +385,7 @@ class Window(QMainWindow):
         document = QTextDocument()
         document.setHtml(''.join(parts))
         if self.photo:
-            document.addResource(QTextDocument.ResourceType.ImageResource,QUrl('sicad-photo'),QImage.fromData(self.photo))
+            document.addResource(QTextDocument.ImageResource,QUrl('sicad-photo'),QImage.fromData(self.photo))
         return document
 
     def pdf(self):
@@ -395,8 +395,8 @@ class Window(QMainWindow):
         path,_ = QFileDialog.getSaveFileName(self,'Salvar ficha','Ficha.pdf','PDF (*.pdf)')
         if path:
             if not path.lower().endswith('.pdf'): path += '.pdf'
-            printer = QPrinter(QPrinter.PrinterMode.HighResolution)
-            printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
+            printer = QPrinter(QPrinter.HighResolution)
+            printer.setOutputFormat(QPrinter.PdfFormat)
             printer.setOutputFileName(path)
             self.document().print_(printer)
             self.statusBar().showMessage('PDF salvo em '+path)
@@ -406,7 +406,7 @@ class Window(QMainWindow):
             QMessageBox.warning(self,'Ficha','Selecione um atleta antes de imprimir.')
             return
         printer = QPrinter()
-        if QPrintDialog(printer,self).exec() == QDialog.DialogCode.Accepted:
+        if QPrintDialog(printer,self).exec_() == QDialog.Accepted:
             self.document().print_(printer)
 
     def backup(self):
@@ -420,12 +420,12 @@ def main():
     application = QApplication(sys.argv)
     application.setOrganizationName('SICAD')
     application.setApplicationName('SICADvolleyballTeste')
-    folder = Path(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppLocalDataLocation))
+    folder = Path(QStandardPaths.writableLocation(QStandardPaths.AppLocalDataLocation))
     folder.mkdir(parents=True,exist_ok=True)
     store = Store(folder/'sicad.sqlite3', ROOT/'assets'/'template.xlsx')
     window = Window(store)
     window.show()
-    sys.exit(application.exec())
+    sys.exit(application.exec_())
 
 
 if __name__ == '__main__':

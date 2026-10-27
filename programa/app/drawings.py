@@ -3,9 +3,9 @@ import posixpath
 import xml.etree.ElementTree as ET
 import zipfile
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QLabel, QPushButton, QMenu, QInputDialog
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QPixmap
+from PySide2.QtWidgets import QLabel, QPushButton, QMenu, QInputDialog
 
 NS = {'x':'http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing',
       'a':'http://schemas.openxmlformats.org/drawingml/2006/main',
@@ -58,7 +58,7 @@ class Drawings:
                 widget.clicked.connect(lambda checked=False,m=obj['macro']:window.run_macro(m))
             else:
                 widget=QLabel(obj['text'],sheet.viewport())
-                widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                widget.setAlignment(Qt.AlignCenter)
             if 'image' in obj:
                 pixmap=QPixmap()
                 if pixmap.loadFromData(obj['image']):
@@ -66,15 +66,15 @@ class Drawings:
                         widget.setPixmap(pixmap)
                         widget.setScaledContents(True)
                     else:
-                        from PySide6.QtGui import QIcon
-                        from PySide6.QtCore import QSize
+                        from PySide2.QtGui import QIcon
+                        from PySide2.QtCore import QSize
                         widget.setIcon(QIcon(pixmap))
                         widget.setIconSize(QSize(int(obj['w']),int(obj['h'])))
             widget.setStyleSheet(f"background:{obj['background']};color:{obj['foreground']};border:0;font-size:12px;font-weight:bold;")
             key='shape:'+obj['name']
             saved=sheet.store.overrides(sheet.sheet.title).get(key)
             if saved is not None: widget.setText(saved)
-            widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            widget.setContextMenuPolicy(Qt.CustomContextMenu)
             widget.customContextMenuRequested.connect(lambda pos,w=widget,k=key:self.edit_text(w,k))
             self.widgets.append((widget,obj))
         sheet.horizontalScrollBar().valueChanged.connect(self.position)

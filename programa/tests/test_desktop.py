@@ -3,8 +3,8 @@ os.environ.setdefault('QT_QPA_PLATFORM','offscreen')
 import tempfile
 import unittest
 from pathlib import Path
-from PySide6.QtWidgets import QApplication
-from PySide6.QtPrintSupport import QPrinter
+from PySide2.QtWidgets import QApplication
+from PySide2.QtPrintSupport import QPrinter
 from app.model import Store
 from app.main import Window
 
@@ -37,7 +37,7 @@ class DesktopTests(unittest.TestCase):
         self.assertIn('TESTE EDITADO',w.document().toPlainText())
         output=Path(self.folder.name)/'ficha.pdf'
         printer=QPrinter()
-        printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
+        printer.setOutputFormat(QPrinter.PdfFormat)
         printer.setOutputFileName(str(output))
         w.document().print_(printer)
         self.assertTrue(output.read_bytes().startswith(b'%PDF-'))

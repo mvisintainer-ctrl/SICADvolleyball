@@ -2,9 +2,9 @@
 setlocal
 cd /d "%~dp0"
 if not exist .venv\Scripts\python.exe (
-  py -3 -m venv .venv
+  py -3.10 -m venv .venv
   if errorlevel 1 (
-    echo Instale o Python 3.11 ou 3.12 de https://www.python.org/downloads/windows/
+    echo Instale o Python 3.10 de 64 bits de https://www.python.org/downloads/windows/
     pause
     exit /b 1
   )

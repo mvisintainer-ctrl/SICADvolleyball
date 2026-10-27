@@ -1,17 +1,16 @@
 # SICAD Volleyball para Windows
 
-## Baixar o programa
+[**BAIXAR O PROGRAMA — EDIÇÃO WINDOWS 10 10240**](https://github.com/mvisintainer-ctrl/SICADvolleyball/raw/refs/heads/main/downloads/SICADvolleyball-Win10-10240.zip)
 
-[**CLIQUE AQUI PARA BAIXAR O ZIP COM O EXECUTÁVEL**](https://github.com/mvisintainer-ctrl/SICADvolleyball/raw/refs/heads/main/downloads/SICADvolleyball-EXE-Windows.zip)
+1. Baixe o ZIP e extraia em uma **pasta nova**.
+2. Abra **SICADvolleyball.exe** com duplo clique.
 
-1. Baixe o ZIP pelo link acima.
-2. Extraia todos os arquivos.
-3. Abra **SICADvolleyball.exe** com duplo clique.
+Não precisa instalar Python nem Excel. Esta edição usa Python 3.10 e Qt 5 para atender Windows 10 de 64 bits, incluindo a compilação 10240. Substitui a edição Qt 6 anterior, cuja exigência de APIs mais recentes causava falha ao importar QtCore nesse Windows.
 
-Windows 10/11 de 64 bits. Não precisa instalar Python nem Excel.
+O pacote público começa sem dados pessoais. Use Novo atleta para criar cadastros de teste. Os dados inseridos ficam no seu computador.
 
-Esta versão pública começa **sem cadastros pessoais ou pagamentos preenchidos**. Use Novo atleta para criar dados de teste. Os dados inseridos ficam no computador do usuário.
+Os seis testes passaram com o novo runtime, e o executável abriu sob Wine 8, com zero cadastros, e encerrou sem erro. Foram verificadas as 79 DLLs/extensões empacotadas quanto às importações diretas das APIs mais recentes listadas no relatório. O teste final em Windows 10 10240 real e a impressora física continuam pendentes, assim como os ajustes visuais e dos desenhos no PDF.
 
-O executável foi compilado com Python para Windows sob Wine. Os seis testes passaram e o `.exe` abriu no Wine 10 com zero cadastros e fechou sem erro. Ainda é necessário validar em um computador Windows e com uma impressora física. A aparência e os desenhos do PDF continuam em avaliação.
+Se houver falha na inicialização, o programa mostra a localização do relatório `erro-inicializacao.txt`.
 
-[Instruções e código-fonte](programa/README.md). O arquivo Excel incorporado a esse executável foi reconstruído sem dados pessoais, VBA ou ActiveX.
+[Instruções e código-fonte](programa/README.md).

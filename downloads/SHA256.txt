@@ -1,1 +1,1 @@
-29cc36a703fa7aad94f7a79b3be33529e3ddc387376bfaf0b2745f92304d7623  SICADvolleyball-EXE-Windows.zip
+d41ad78fe98a9bd1c695c85ec471171f0aa8398ea8392191634ef6f7f7c36e40  SICADvolleyball-Win10-10240.zip
